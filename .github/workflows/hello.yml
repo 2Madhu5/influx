@@ -1,4 +1,4 @@
-name: Hello GitHub Actions
+name: Repository CI
 
 on:
   push:
@@ -6,14 +6,28 @@ on:
       - branch-protection-test
 
 jobs:
-  hello:
+  validate:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Show files
-        run: ls -la
+      - name: Check required files
+        run: |
+          test -f README.md
+          test -f data.csv
+          echo "Required files are present"
 
-      - name: Print message
-        run: echo "Hello from GitHub Actions"
+      - name: Check CSV file
+        run: |
+          wc -l data.csv
+          echo "CSV file validation completed"
+
+  report:
+    needs: validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print result
+        run: echo "Validation job completed successfully"
